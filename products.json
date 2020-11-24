@@ -1,1 +1,16 @@
-[{"name":"cola","cost":1.5,"amount":4},{"name":"candy","cost":3,"amount":5},{"name":"chips","cost":2.8,"amount":3}]
+[{
+        "name": "cola",
+        "cost": 1.5,
+        "amount": 4
+    },
+    {
+        "name": "candy",
+        "cost": 3,
+        "amount": 5
+    },
+    {
+        "name": "chips",
+        "cost": 2.8,
+        "amount": 3
+    }
+]
