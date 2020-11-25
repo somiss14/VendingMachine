@@ -80,88 +80,41 @@ try {
         console.log("0.Exit\n");
         readline.question('INSERT PRODUCT NUMBER\n\n', choice => {
 
-            if (choice === "1") {
-                if (machineBalance - `${products[0].cost}` < 0) {
-                    console.log("Exact Change Only");
+            for (let i = 0; i < products.length; i++) {
+                if (choice == i+1) {
+                    if (machineBalance - `${products[i].cost}` < 0) {
+                        console.log("Exact Change Only");
+                        changeReturn(balance);
+                        return process.exit(1);
+                    }
+                    console.log("\nyour choice is " + `${products[i].name}` + "\n");
+                    if (`${products[i].amount}` > 0) {
+                        console.log("product available(" + `${products[i].amount}` + ")\n");
+                        console.log("cost:" + `${products[i].cost}` + "\n");
+                        let change = balance - `${products[i].cost}` * 10;
+                        if (change >= 0) {
+                            console.log("here is your product \n");
+                            products[i].amount -= 1;
+                            changeReturn(change);
+                        }
+                        if (change < 0) {
+                            console.log("not enough money\n");
+                            moneyInput(readline);
+                        }
+                    } else {
+                        console.log("\nproduct unavailable\n");
+                        productInput(readline, products);
+                    }
+                } else if (choice === "0") {
                     changeReturn(balance);
                     return process.exit(1);
-                }
-                console.log("\nyour choice is cola\n");
-                if (`${products[0].amount}` > 0) {
-                    console.log("product available(" + `${products[0].amount}` + ")\n");
-                    console.log("cost:" + `${products[0].cost}` + "\n");
-                    let change = balance - `${products[0].cost}` * 10;
-                    if (change >= 0) {
-                        console.log("here is your product \n");
-                        products[0].amount -= 1;
-                        changeReturn(change);
-                    }
-                    if (change < 0) {
-                        console.log("not enough money\n");
-                        moneyInput(readline);
-                    }
                 } else {
-                    console.log("\nproduct unavailable\n");
+                    console.log("\nwrong choice\n");
                     productInput(readline, products);
                 }
-            } else if (choice === "2") {
-                if (machineBalance - `${products[1].cost}` < 0) {
-                    console.log("Exact Change Only");
-                    changeReturn(balance);
-                    return process.exit(1);
-                }
-                console.log("\nyour choice is chips\n");
-                if (`${products[1].amount}` > 0) {
-                    console.log("product available(" + `${products[1].amount}` + ")\n");
-                    console.log("cost:" + `${products[1].cost}` + "\n");
-                    let change = balance - `${products[1].cost}` * 10;
-                    console.log(change);
-                    if (change >= 0) {
-                        console.log("here is your product \n");
-                        products[1].amount -= 1;
-                        changeReturn(change);
-                    }
-                    if (change < 0) {
-                        console.log("not enough money \n");
-                        moneyInput(readline);
-                    }
-                } else {
-                    console.log("\nproduct unavailable \n");
-                    productInput(readline, products);
-                }
-            } else if (choice === "3") {
-                if (machineBalance - `${products[2].cost}` < 0) {
-                    console.log("Exact Change Only");
-                    changeReturn(balance);
-                    return process.exit(1);
-                }
-                console.log("\nyour choice is candy\n");
-                if (`${products[2].amount}` > 0) {
-                    console.log("product available(" + `${products[2].amount}` + ")\n");
-                    console.log("cost:" + `${products[2].cost}` + "\n");
-                    let change = balance - `${products[2].cost}` * 10;
-                    if (change >= 0) {
-                        console.log("here is your product\n");
-                        products[2].amount -= 1;
-                        changeReturn(change);
-                    }
-                    if (change < 0) {
-                        console.log("not enough money\n");
-                        moneyInput(readline);
-                    }
-                } else {
-                    console.log("\nproduct unavailable\n");
-                    productInput(readline, products);
-                }
-            } else if (choice === "0") {
-                changeReturn(balance);
-                return process.exit(1);
-            } else {
-                console.log("\nwrong choice\n");
-                productInput(readline, products);
             }
-        });
-    }
+        })
+    };
 
     function changeReturn(change) {
         let x = 0;
