@@ -1,24 +1,22 @@
-let invalid = [];
 let balance = 0;
-let valid = [];
 const fs = require('fs');
-
-function getMachineBalance(balances) {
-    let machineBalance = 0;
-
-    for (let balance of balances) {
-        machineBalance += balance.amount * getIntCoinValue(balance.value);
-    }
-    return machineBalance;
-}
 
 try {
 
+    function getMachineBalance(balances) {
+        let machineBalance = 0;
+
+        for (let balance of balances) {
+            machineBalance += balance.amount * getIntCoinValue(balance.value);
+        }
+        return machineBalance;
+    }
+
     const data = fs.readFileSync('products.json', 'utf8');
-    const productss = JSON.parse(data);
+    const products = JSON.parse(data);
     const data2 = fs.readFileSync('balance.json', 'utf8');
-    const balancee = JSON.parse(data2);
-    let machineBalance = getMachineBalance(balancee);
+    const startingMachineBalance = JSON.parse(data2);
+    let machineBalance = getMachineBalance(startingMachineBalance);
 
     function initiate() {
         return require('readline').createInterface({
@@ -48,52 +46,54 @@ try {
         return coin === "5" || coin === "2" || coin === "1" || coin === "0.5" || coin === "0.2" || coin === "0.1";
     }
 
-    function moneyInput(readline) {
-        readline.question('\nINSERT COIN or type "product" to choose\n\n', amount => {
-            if (amount === "0.05" || amount === "0.02" || amount === "0.01") {
-                invalid += amount;
-                console.log("\nValue Too Low\n");
-                console.log("Here Is Your Coin Back:" + amount);
-                moneyInput(readline);
-            } else if (isAllowCoin(amount)) {
-                balancee.find(x => { if (x.value == amount) { x.amount += 1; } });
-                amount = getIntCoinValue(amount);
+    function isNotAllowCoin(coin) {
+        return coin === "0.05" || coin === "0.02" || coin === "0.01";
+    }
 
-                valid += amount;
-                balance += amount;
+    function moneyInput(readline) {
+        readline.question('\nINSERT COIN or type "product" to choose\n\n', coin => {
+            if (isNotAllowCoin(coin)) {
+                console.log("\nValue Too Low\n");
+                console.log("Here Is Your Coin Back:" + coin);
+                moneyInput(readline);
+            } else if (isAllowCoin(coin)) {
+                startingMachineBalance.find(x => { if (x.value == coin) { x.amount += 1; } });
+                coin = getIntCoinValue(coin);
+                balance += coin;
                 console.log("\nYour balance:" + balance / 10);
                 moneyInput(readline);
-            } else if (amount === "product") {
-                productInput(readline, productss);
+            } else if (coin === "product") {
+                productInput(readline, products);
             } else {
                 console.log("\nInvalid Coin Value");
                 moneyInput(readline);
             }
         });
     }
+    // ---------------------------------------------
 
-    function productInput(readline, productss) {
+    function productInput(readline, products) {
         console.log("\nchoose product\n");
-        for (let i = 0; i < productss.length; i++) {
-            console.log(i + 1 + "." + `${productss[i].name}`)
+        for (let i = 0; i < products.length; i++) {
+            console.log(i + 1 + "." + `${products[i].name}`)
         }
         console.log("0.Exit\n");
         readline.question('INSERT PRODUCT NUMBER\n\n', choice => {
 
             if (choice === "1") {
-                if (machineBalance - `${productss[0].cost}` < 0) {
+                if (machineBalance - `${products[0].cost}` < 0) {
                     console.log("Exact Change Only");
                     changeReturn(balance);
                     return process.exit(1);
                 }
                 console.log("\nyour choice is cola\n");
-                if (`${productss[0].amount}` > 0) {
-                    console.log("product available(" + `${productss[0].amount}` + ")\n");
-                    console.log("cost:" + `${productss[0].cost}` + "\n");
-                    let change = balance - `${productss[0].cost}` * 10;
+                if (`${products[0].amount}` > 0) {
+                    console.log("product available(" + `${products[0].amount}` + ")\n");
+                    console.log("cost:" + `${products[0].cost}` + "\n");
+                    let change = balance - `${products[0].cost}` * 10;
                     if (change >= 0) {
                         console.log("here is your product \n");
-                        productss[0].amount -= 1;
+                        products[0].amount -= 1;
                         changeReturn(change);
                     }
                     if (change < 0) {
@@ -102,23 +102,23 @@ try {
                     }
                 } else {
                     console.log("\nproduct unavailable\n");
-                    productInput(readline, productss);
+                    productInput(readline, products);
                 }
             } else if (choice === "2") {
-                if (machineBalance - `${productss[1].cost}` < 0) {
+                if (machineBalance - `${products[1].cost}` < 0) {
                     console.log("Exact Change Only");
                     changeReturn(balance);
                     return process.exit(1);
                 }
                 console.log("\nyour choice is chips\n");
-                if (`${productss[1].amount}` > 0) {
-                    console.log("product available(" + `${productss[1].amount}` + ")\n");
-                    console.log("cost:" + `${productss[1].cost}` + "\n");
-                    let change = balance - `${productss[1].cost}` * 10;
+                if (`${products[1].amount}` > 0) {
+                    console.log("product available(" + `${products[1].amount}` + ")\n");
+                    console.log("cost:" + `${products[1].cost}` + "\n");
+                    let change = balance - `${products[1].cost}` * 10;
                     console.log(change);
                     if (change >= 0) {
                         console.log("here is your product \n");
-                        productss[1].amount -= 1;
+                        products[1].amount -= 1;
                         changeReturn(change);
                     }
                     if (change < 0) {
@@ -127,22 +127,22 @@ try {
                     }
                 } else {
                     console.log("\nproduct unavailable \n");
-                    productInput(readline, productss);
+                    productInput(readline, products);
                 }
             } else if (choice === "3") {
-                if (machineBalance - `${productss[2].cost}` < 0) {
+                if (machineBalance - `${products[2].cost}` < 0) {
                     console.log("Exact Change Only");
                     changeReturn(balance);
                     return process.exit(1);
                 }
                 console.log("\nyour choice is candy\n");
-                if (`${productss[2].amount}` > 0) {
-                    console.log("product available(" + `${productss[2].amount}` + ")\n");
-                    console.log("cost:" + `${productss[2].cost}` + "\n");
-                    let change = balance - `${productss[2].cost}` * 10;
+                if (`${products[2].amount}` > 0) {
+                    console.log("product available(" + `${products[2].amount}` + ")\n");
+                    console.log("cost:" + `${products[2].cost}` + "\n");
+                    let change = balance - `${products[2].cost}` * 10;
                     if (change >= 0) {
                         console.log("here is your product\n");
-                        productss[2].amount -= 1;
+                        products[2].amount -= 1;
                         changeReturn(change);
                     }
                     if (change < 0) {
@@ -151,14 +151,14 @@ try {
                     }
                 } else {
                     console.log("\nproduct unavailable\n");
-                    productInput(readline, productss);
+                    productInput(readline, products);
                 }
             } else if (choice === "0") {
                 changeReturn(balance);
                 return process.exit(1);
             } else {
                 console.log("\nwrong choice\n");
-                productInput(readline, productss);
+                productInput(readline, products);
             }
         });
     }
@@ -200,26 +200,63 @@ try {
                 }
             }
         }
-        for (let i = 0; i <= list.length; i++) {
-            if (list[i] === 5) {
-                balancee[0].amount--;
-            } else if (list[i] === 2) {
-                balancee[1].amount--;
-            } else if (list[i] === 1) {
-                balancee[2].amount--;
-            } else if (list[i] === 0.5) {
-                balancee[3].amount--;
-            } else if (list[i] === 0.2) {
-                balancee[4].amount--;
-            } else if (list[i] === 0.1) {
-                balancee[5].amount--;
+
+        function reduceCoinAmount(list) {
+            for (let i = 0; i <= list.length; i++) {
+                switch (list[i]) {
+                    case 0.1:
+                        startingMachineBalance.find(x => {
+                            if (x.value === list[i]) {
+                                x.amount -= 1;
+                            }
+                        });
+                        break;
+                    case 0.2:
+                        startingMachineBalance.find(x => {
+                            if (x.value === list[i]) {
+                                x.amount -= 1;
+                            }
+                        });
+                        break;
+                    case 0.5:
+                        startingMachineBalance.find(x => {
+                            if (x.value === list[i]) {
+                                x.amount -= 1;
+                            }
+                        });
+                        break;
+                    case 1:
+                        startingMachineBalance.find(x => {
+                            if (x.value === list[i]) {
+                                x.amount -= 1;
+                            }
+                        });
+                        break;
+                    case 2:
+                        startingMachineBalance.find(x => {
+                            if (x.value === list[i]) {
+                                x.amount -= 1;
+                            }
+                        });
+                        break;
+                    case 5:
+                        startingMachineBalance.find(x => {
+                            if (x.value === list[i]) {
+                                x.amount -= 1;
+                            }
+                        });
+                        break;
+                }
             }
         }
+
+        reduceCoinAmount(list);
+
         console.log("Your Change Back Is:" + list);
 
-        const balanceData = JSON.stringify(balancee);
+        const balanceData = JSON.stringify(startingMachineBalance);
 
-        const productsData = JSON.stringify(productss);
+        const productsData = JSON.stringify(products);
 
         fs.writeFileSync('balance.json', balanceData, 'utf8');
 
