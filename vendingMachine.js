@@ -1,22 +1,17 @@
 let balance = 0;
+let list = [];
+let firstLoop = 0;
+let secondLoop = 0;
+let x = 0;
+let valid = [];
 const fs = require('fs');
 
 try {
-
-    function getMachineBalance(balances) {
-        let machineBalance = 0;
-
-        for (let balance of balances) {
-            machineBalance += balance.amount * getIntCoinValue(balance.value);
-        }
-        return machineBalance;
-    }
 
     const data = fs.readFileSync('products.json', 'utf8');
     const products = JSON.parse(data);
     const data2 = fs.readFileSync('balance.json', 'utf8');
     const startingMachineBalance = JSON.parse(data2);
-    let machineBalance = getMachineBalance(startingMachineBalance);
 
     function initiate() {
         return require('readline').createInterface({
@@ -60,6 +55,7 @@ try {
                 startingMachineBalance.find(x => { if (x.value == coin) { x.amount += 1; } });
                 coin = getIntCoinValue(coin);
                 balance += coin;
+                valid.push(coin/10);
                 console.log("\nYour balance:" + balance / 10);
                 moneyInput(readline);
             } else if (coin === "product") {
@@ -82,24 +78,24 @@ try {
 
             for (let i = 0; i < products.length; i++) {
                 if (choice == i+1) {
-                    if (machineBalance - `${products[i].cost}` < 0) {
-                        console.log("Exact Change Only");
-                        changeReturn(balance);
-                        return process.exit(1);
-                    }
                     console.log("\nyour choice is " + `${products[i].name}` + "\n");
                     if (`${products[i].amount}` > 0) {
                         console.log("product available(" + `${products[i].amount}` + ")\n");
                         console.log("cost:" + `${products[i].cost}` + "\n");
                         let change = balance - `${products[i].cost}` * 10;
-                        if (change >= 0) {
+                        if (change >= 0 && changeReturn(change)) {
                             console.log("here is your product \n");
                             products[i].amount -= 1;
-                            changeReturn(change);
+                            callback(list);
                         }
                         if (change < 0) {
                             console.log("not enough money\n");
                             moneyInput(readline);
+                        }
+                        else{
+                            console.log("Exact Change Only");
+                            console.log("Your Coin Back: " + valid);
+                            return process.exit(1);
                         }
                     } else {
                         console.log("\nproduct unavailable\n");
@@ -114,97 +110,97 @@ try {
                 }
             }
         })
-    };
+    }
 
-    function changeReturn(change) {
-        let x = 0;
-        let list = [];
-        while (x !== change) {
-            x += 50;
-            list.push(5);
-            if (x > change) {
-                x -= 50;
-                list.pop();
-                x += 20;
-                list.push(2);
-                if (x > change) {
-                    x -= 20;
-                    list.pop();
-                    x += 10;
-                    list.push(1);
+
+        function changeReturn(change) {
+            list = [];
+            secondLoop = 0;
+            firstLoop = 0;
+            x = 0;
+
+            while (x !== (Math.floor(change/10))*10) {
+                if (x < change && startingMachineBalance[0].amount > 0) {
+                    x += 50;
+                    list.push(5);
+                    startingMachineBalance[0].amount--;
                     if (x > change) {
-                        x -= 10;
+                        x -= 50;
                         list.pop();
-                        x += 5;
-                        list.push(0.5);
+                        startingMachineBalance[0].amount++;
+                    }
+                    if (x < change && startingMachineBalance[1].amount > 0) {
+                        x += 20;
+                        list.push(2);
+                        startingMachineBalance[1].amount -=1;
                         if (x > change) {
-                            x -= 5;
+                            x -= 20;
                             list.pop();
-                            x += 2;
-                            list.push(0.2);
-                            if (x > change) {
-                                x -= 2;
-                                list.pop();
-                                x += 1;
-                                list.push(0.1);
-                            }
+                            startingMachineBalance[1].amount +=1;
                         }
+                    }
+                    if (x < change && startingMachineBalance[2].amount > 0) {
+                        x += 10;
+                        list.push(1);
+                        startingMachineBalance[2].amount--;
+                        if (x > change) {
+                            x -= 10;
+                            list.pop();
+                            startingMachineBalance[2].amount++;
+                        }
+                    }
+
+                    firstLoop++;
+                    if (firstLoop === 30 && x !== change) {
+                        break;
                     }
                 }
             }
-        }
-
-        function reduceCoinAmount(list) {
-            for (let i = 0; i <= list.length; i++) {
-                switch (list[i]) {
-                    case 0.1:
-                        startingMachineBalance.find(x => {
-                            if (x.value === list[i]) {
-                                x.amount -= 1;
-                            }
-                        });
-                        break;
-                    case 0.2:
-                        startingMachineBalance.find(x => {
-                            if (x.value === list[i]) {
-                                x.amount -= 1;
-                            }
-                        });
-                        break;
-                    case 0.5:
-                        startingMachineBalance.find(x => {
-                            if (x.value === list[i]) {
-                                x.amount -= 1;
-                            }
-                        });
-                        break;
-                    case 1:
-                        startingMachineBalance.find(x => {
-                            if (x.value === list[i]) {
-                                x.amount -= 1;
-                            }
-                        });
-                        break;
-                    case 2:
-                        startingMachineBalance.find(x => {
-                            if (x.value === list[i]) {
-                                x.amount -= 1;
-                            }
-                        });
-                        break;
-                    case 5:
-                        startingMachineBalance.find(x => {
-                            if (x.value === list[i]) {
-                                x.amount -= 1;
-                            }
-                        });
-                        break;
+            while (x !== change) {
+                if (x < change && startingMachineBalance[3].amount > 0) {
+                    x += 5;
+                    list.push(0.5);
+                    startingMachineBalance[3].amount--;
+                    if (x > change) {
+                        x -= 5;
+                        list.pop();
+                        startingMachineBalance[3].amount++;
+                    }
+                }
+                if (x < change && startingMachineBalance[4].amount > 0) {
+                    x += 2;
+                    list.push(0.2);
+                    startingMachineBalance[4].amount--;
+                    if (x > change) {
+                        x -= 2;
+                        list.pop();
+                        startingMachineBalance[4].amount++;
+                    }
+                }
+                if (x < change && startingMachineBalance[5].amount > 0) {
+                    x += 1;
+                    list.push(0.1);
+                    startingMachineBalance[5].amount--;
+                    if (x > change) {
+                        x -= 1;
+                        list.pop();
+                        startingMachineBalance[5].amount++;
+                    }
+                }
+                secondLoop++;
+                if (secondLoop === 30 && x !== change) {
+                    break;
                 }
             }
-        }
+            if(change === x){
+                return true;
+            }
+            else{
+                return false;
+            }
 
-        reduceCoinAmount(list);
-
+    }
+    function callback (list){
         console.log("Your Change Back Is:" + list);
 
         const balanceData = JSON.stringify(startingMachineBalance);
