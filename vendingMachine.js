@@ -52,10 +52,14 @@ try {
                 console.log("Here Is Your Coin Back:" + coin);
                 moneyInput(readline);
             } else if (isAllowCoin(coin)) {
-                startingMachineBalance.find(x => { if (x.value == coin) { x.amount += 1; } });
+                startingMachineBalance.find(x => {
+                    if (x.value == coin) {
+                        x.amount += 1;
+                    }
+                });
                 coin = getIntCoinValue(coin);
                 balance += coin;
-                valid.push(coin/10);
+                valid.push(coin / 10);
                 console.log("\nYour balance:" + balance / 10);
                 moneyInput(readline);
             } else if (coin === "product") {
@@ -66,7 +70,6 @@ try {
             }
         });
     }
-    // ---------------------------------------------
 
     function productInput(readline, products) {
         console.log("\nchoose product\n");
@@ -77,7 +80,7 @@ try {
         readline.question('INSERT PRODUCT NUMBER\n\n', choice => {
 
             for (let i = 0; i < products.length; i++) {
-                if (choice == i+1) {
+                if (choice == i + 1) {
                     console.log("\nyour choice is " + `${products[i].name}` + "\n");
                     if (`${products[i].amount}` > 0) {
                         console.log("product available(" + `${products[i].amount}` + ")\n");
@@ -91,8 +94,7 @@ try {
                         if (change < 0) {
                             console.log("not enough money\n");
                             moneyInput(readline);
-                        }
-                        else{
+                        } else {
                             console.log("Exact Change Only");
                             console.log("Your Coin Back: " + valid);
                             return process.exit(1);
@@ -112,95 +114,94 @@ try {
         })
     }
 
+    function changeReturn(change) {
+        list = [];
+        secondLoop = 0;
+        firstLoop = 0;
+        x = 0;
 
-        function changeReturn(change) {
-            list = [];
-            secondLoop = 0;
-            firstLoop = 0;
-            x = 0;
+        while (x !== (Math.floor(change / 10)) * 10) {
+            if (x < change && startingMachineBalance[0].amount > 0) {
+                x += 50;
+                list.push(5);
+                startingMachineBalance[0].amount--;
+                if (x > change) {
+                    x -= 50;
+                    list.pop();
+                    startingMachineBalance[0].amount++;
+                }
+                if (x < change && startingMachineBalance[1].amount > 0) {
+                    x += 20;
+                    list.push(2);
+                    startingMachineBalance[1].amount -= 1;
+                    if (x > change) {
+                        x -= 20;
+                        list.pop();
+                        startingMachineBalance[1].amount += 1;
+                    }
+                }
+                if (x < change && startingMachineBalance[2].amount > 0) {
+                    x += 10;
+                    list.push(1);
+                    startingMachineBalance[2].amount--;
+                    if (x > change) {
+                        x -= 10;
+                        list.pop();
+                        startingMachineBalance[2].amount++;
+                    }
+                }
 
-            while (x !== (Math.floor(change/10))*10) {
-                if (x < change && startingMachineBalance[0].amount > 0) {
-                    x += 50;
-                    list.push(5);
-                    startingMachineBalance[0].amount--;
-                    if (x > change) {
-                        x -= 50;
-                        list.pop();
-                        startingMachineBalance[0].amount++;
-                    }
-                    if (x < change && startingMachineBalance[1].amount > 0) {
-                        x += 20;
-                        list.push(2);
-                        startingMachineBalance[1].amount -=1;
-                        if (x > change) {
-                            x -= 20;
-                            list.pop();
-                            startingMachineBalance[1].amount +=1;
-                        }
-                    }
-                    if (x < change && startingMachineBalance[2].amount > 0) {
-                        x += 10;
-                        list.push(1);
-                        startingMachineBalance[2].amount--;
-                        if (x > change) {
-                            x -= 10;
-                            list.pop();
-                            startingMachineBalance[2].amount++;
-                        }
-                    }
-
-                    firstLoop++;
-                    if (firstLoop === 30 && x !== change) {
-                        break;
-                    }
-                }
-            }
-            while (x !== change) {
-                if (x < change && startingMachineBalance[3].amount > 0) {
-                    x += 5;
-                    list.push(0.5);
-                    startingMachineBalance[3].amount--;
-                    if (x > change) {
-                        x -= 5;
-                        list.pop();
-                        startingMachineBalance[3].amount++;
-                    }
-                }
-                if (x < change && startingMachineBalance[4].amount > 0) {
-                    x += 2;
-                    list.push(0.2);
-                    startingMachineBalance[4].amount--;
-                    if (x > change) {
-                        x -= 2;
-                        list.pop();
-                        startingMachineBalance[4].amount++;
-                    }
-                }
-                if (x < change && startingMachineBalance[5].amount > 0) {
-                    x += 1;
-                    list.push(0.1);
-                    startingMachineBalance[5].amount--;
-                    if (x > change) {
-                        x -= 1;
-                        list.pop();
-                        startingMachineBalance[5].amount++;
-                    }
-                }
-                secondLoop++;
-                if (secondLoop === 30 && x !== change) {
+                firstLoop++;
+                if (firstLoop === 30 && x !== change) {
                     break;
                 }
             }
-            if(change === x){
-                return true;
+        }
+        while (x !== change) {
+            if (x < change && startingMachineBalance[3].amount > 0) {
+                x += 5;
+                list.push(0.5);
+                startingMachineBalance[3].amount--;
+                if (x > change) {
+                    x -= 5;
+                    list.pop();
+                    startingMachineBalance[3].amount++;
+                }
             }
-            else{
-                return false;
+            if (x < change && startingMachineBalance[4].amount > 0) {
+                x += 2;
+                list.push(0.2);
+                startingMachineBalance[4].amount--;
+                if (x > change) {
+                    x -= 2;
+                    list.pop();
+                    startingMachineBalance[4].amount++;
+                }
             }
+            if (x < change && startingMachineBalance[5].amount > 0) {
+                x += 1;
+                list.push(0.1);
+                startingMachineBalance[5].amount--;
+                if (x > change) {
+                    x -= 1;
+                    list.pop();
+                    startingMachineBalance[5].amount++;
+                }
+            }
+            secondLoop++;
+            if (secondLoop === 30 && x !== change) {
+                break;
+            }
+        }
+        if (change === x) {
+            return true;
+        } else {
+            return false;
+        }
 
     }
-    function callback (list){
+
+    function callback(list) {
         console.log("Your Change Back Is:" + list);
 
         const balanceData = JSON.stringify(startingMachineBalance);
@@ -213,7 +214,6 @@ try {
 
         return process.exit(1);
     }
-
 
 } catch (err) {
     console.log(`Error reading file from disk: ${err}`);
